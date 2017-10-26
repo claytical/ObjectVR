@@ -1,8 +1,10 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+namespace Valve.VR.InteractionSystem {
+    [RequireComponent(typeof(Interactable))]
 
-public class ChestGun : MonoBehaviour {
+    public class ChestGun : MonoBehaviour {
 	public GameObject projectile;
 	public float speed;
 	public float timeBetweenShots;
@@ -17,24 +19,27 @@ public class ChestGun : MonoBehaviour {
 		Shoot ();
 	}
 
-	void Shoot() {
-		if(Input.GetAxis("Fire1") == 1) {
-			if (lastShotTime + timeBetweenShots <= Time.time) {
-				// Create the Bullet from the Bullet Prefab
+        void Shoot() {
 
-				GameObject bullet = (GameObject)Instantiate (projectile, transform.position, Camera.main.transform.rotation);
-//				GameObject bullet = (GameObject)Instantiate (projectile, transform.position, transform.rotation);
+            for (int i = 0; i < Player.instance.handCount; i++)
+            {
+                Hand hand = Player.instance.GetHand(i);
 
-				// Add velocity to the bullet
-				bullet.GetComponent<Rigidbody> ().velocity = bullet.transform.forward * speed;
-//				bullet.GetComponent<Rigidbody>().velocity = Vector3.down * speed;
-				// Destroy the bullet after 5 seconds
-				Destroy (bullet, 5.0f);
-				lastShotTime = Time.time;
-			}
+                if (hand.controller != null)
+                {
+                    if (hand.controller.GetPressDown(Valve.VR.EVRButtonId.k_EButton_SteamVR_Trigger))
+                    {
+                        //SHOOT SOMETHING
+                        GameObject bullet = (GameObject)Instantiate(projectile, transform.position, Camera.main.transform.rotation);
+
+                        // Add velocity to the bullet
+                        bullet.GetComponent<Rigidbody>().velocity = bullet.transform.forward;
+                    }
+                }
+            }
+
+        }
+        
 		}
-
-	}
-
 
 }
